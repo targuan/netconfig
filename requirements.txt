@@ -1,0 +1,7 @@
+django
+djangorestframework
+django-filter
+napalm
+drf-spectacular
+requests
+gunicorn
