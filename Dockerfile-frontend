@@ -1,0 +1,14 @@
+ARG BASE_IMAGE
+
+FROM node:24-alpine
+COPY frontend /frontend
+WORKDIR /frontend
+RUN npm install -g @angular/cli && npm install && ng build
+
+# Use an official Python runtime as a parent image
+FROM ${BASE_IMAGE}
+
+COPY --from=0 /frontend/dist/frontend/browser /app/static
+
+# Run migrations and start server
+CMD ["sh", "-c", "python manage.py collectstatic"]
