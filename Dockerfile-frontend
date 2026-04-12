@@ -12,3 +12,7 @@ COPY --from=0 /frontend/dist/frontend/browser /app/static
 
 # Run migrations and start server
 CMD ["sh", "-c", "python manage.py collectstatic"]
+
+FROM nginx:stable
+
+COPY --from=1 "/var/www/static/" "/var/www/static/"
