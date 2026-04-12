@@ -18,7 +18,7 @@ COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project
-COPY --exclude frontend . /app/
+COPY frontend . /app/
 COPY --from=0 /frontend/dist/frontend/browser /app/static
 
 # Expose port 8000
