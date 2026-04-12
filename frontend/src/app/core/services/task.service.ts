@@ -7,7 +7,7 @@ import { Task, TaskStatus } from '../models/api.models';
   providedIn: 'root'
 })
 export class TaskService {
-  private apiUrl = 'https://netgui.targuan.fr/api/tasks/';
+  private apiUrl = '/api/tasks/';
 
   constructor(private http: HttpClient) { }
 
