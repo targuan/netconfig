@@ -1,3 +1,8 @@
+FROM node:24-alpine
+COPY frontend /frontend
+WORKDIR /frontend
+RUN npm install -g @angular/cli && npm install && ng build
+
 # Use an official Python runtime as a parent image
 FROM python:3.12-slim
 
@@ -20,6 +25,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project
 COPY . /app/
+COPY --from=0 /frontend/dist /app/front
 
 # Expose port 8000
 EXPOSE 8000
