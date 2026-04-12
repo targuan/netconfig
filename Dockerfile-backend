@@ -1,6 +1,6 @@
 ARG BASE_IMAGE
 
-FROM node:24-alpine
+FROM ${BASE_IMAGE}
 
 # Expose port 8000
 EXPOSE 8000

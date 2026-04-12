@@ -1,18 +1,18 @@
 ARG BASE_IMAGE
 
-FROM node:24-alpine
+FROM node:24-alpine AS build
 COPY frontend /frontend
 WORKDIR /frontend
 RUN npm install -g @angular/cli && npm install && ng build
 
 # Use an official Python runtime as a parent image
-FROM ${BASE_IMAGE}
+FROM ${BASE_IMAGE} AS static
 
-COPY --from=0 /frontend/dist/frontend/browser /app/static
+COPY --from=build /frontend/dist/frontend/browser /app/static
 
 # Run migrations and start server
 CMD ["sh", "-c", "python manage.py collectstatic"]
 
 FROM nginx:stable
 
-COPY --from=1 "/var/www/static/" "/var/www/static/"
+COPY --from=static "/var/www/static/" "/var/www/static/"
