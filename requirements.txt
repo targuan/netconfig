@@ -5,3 +5,4 @@ napalm
 drf-spectacular
 requests
 gunicorn
+django-cors-headers
