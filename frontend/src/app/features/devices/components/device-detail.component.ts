@@ -17,6 +17,7 @@ import { TaskService } from '../../../core/services/task.service';
 import { Device, DeviceConfig, Task } from '../../../core/models/api.models';
 import { TaskLogsDialogComponent } from '../../tasks/components/task-logs-dialog.component';
 import { Observable, switchMap, timer, startWith, map } from 'rxjs';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-device-detail',
@@ -32,7 +33,8 @@ import { Observable, switchMap, timer, startWith, map } from 'rxjs';
     MatTableModule,
     MatChipsModule,
     MatDialogModule,
-    FormsModule
+    FormsModule,
+    RouterLink,
   ],
   templateUrl: './device-detail.component.html',
   styleUrl: './device-detail.component.scss'
