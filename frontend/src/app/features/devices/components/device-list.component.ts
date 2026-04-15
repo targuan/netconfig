@@ -21,59 +21,8 @@ import { Observable } from 'rxjs';
     MatDialogModule,
     RouterLink
   ],
-  template: `
-    <div class="header">
-      <h1>Devices</h1>
-      <button mat-raised-button color="primary" (click)="addDevice()">
-        <mat-icon>add</mat-icon> Add Device
-      </button>
-    </div>
-
-    <table mat-table [dataSource]="devices$" class="mat-elevation-z8">
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef> Name </th>
-        <td mat-cell *matCellDef="let device"> {{device.name}} </td>
-      </ng-container>
-
-      <ng-container matColumnDef="ip">
-        <th mat-header-cell *matHeaderCellDef> IP Address </th>
-        <td mat-cell *matCellDef="let device"> {{device.ip_address}} </td>
-      </ng-container>
-
-      <ng-container matColumnDef="vendor">
-        <th mat-header-cell *matHeaderCellDef> Vendor </th>
-        <td mat-cell *matCellDef="let device"> {{device.vendor}} </td>
-      </ng-container>
-
-      <ng-container matColumnDef="driver">
-        <th mat-header-cell *matHeaderCellDef> Driver </th>
-        <td mat-cell *matCellDef="let device"> {{device.napalm_driver}} </td>
-      </ng-container>
-
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef> Actions </th>
-        <td mat-cell *matCellDef="let device">
-          <button mat-icon-button [routerLink]="['/devices', device.id]" color="primary">
-            <mat-icon>visibility</mat-icon>
-          </button>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-  `,
-  styles: [`
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    table {
-      width: 100%;
-    }
-  `]
+  templateUrl: './device-list.component.html',
+  styleUrl: './device-list.component.scss'
 })
 export class DeviceListComponent implements OnInit {
   private deviceService = inject(DeviceService);

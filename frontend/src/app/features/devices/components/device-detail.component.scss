@@ -1,0 +1,13 @@
+.container { display: flex; flex-direction: column; gap: 20px; }
+.header { display: flex; justify-content: space-between; align-items: center; }
+.grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+.full-width { width: 100%; }
+.version-info { margin-top: 10px; font-style: italic; color: #666; }
+.tasks-card { margin-top: 20px; }
+
+.status-pending_approval { background-color: orange !important; color: white !important; }
+.status-running { background-color: #2196f3 !important; color: white !important; }
+.status-success { background-color: #4caf50 !important; color: white !important; }
+.status-failed { background-color: #f44336 !important; color: white !important; }
+.status-approved { background-color: #9c27b0 !important; color: white !important; }
+.status-queued { background-color: #607d8b !important; color: white !important; }

@@ -18,55 +18,8 @@ import { DeviceService } from '../../../core/services/device.service';
     MatButtonModule,
     ReactiveFormsModule
   ],
-  template: `
-    <h2 mat-dialog-title>Add New Device</h2>
-    <mat-dialog-content>
-      <form [formGroup]="deviceForm" class="device-form">
-        <mat-form-field appearance="outline">
-          <mat-label>Name</mat-label>
-          <input matInput formControlName="name" placeholder="Edge-Router-01">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>IP Address</mat-label>
-          <input matInput formControlName="ip_address" placeholder="192.168.1.1">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Vendor</mat-label>
-          <input matInput formControlName="vendor" placeholder="Arista">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>NAPALM Driver</mat-label>
-          <input matInput formControlName="napalm_driver" placeholder="eos">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Username</mat-label>
-          <input matInput formControlName="username">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Password</mat-label>
-          <input matInput type="password" formControlName="password">
-        </mat-form-field>
-      </form>
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
-      <button mat-raised-button color="primary" [disabled]="deviceForm.invalid" (click)="onSubmit()">Add Device</button>
-    </mat-dialog-actions>
-  `,
-  styles: [`
-    .device-form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      min-width: 300px;
-      padding-top: 10px;
-    }
-  `]
+  templateUrl: './add-device-dialog.component.html',
+  styleUrl: './add-device-dialog.component.scss'
 })
 export class AddDeviceDialogComponent {
   private fb = inject(FormBuilder);
