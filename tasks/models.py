@@ -19,6 +19,7 @@ class Task(models.Model):
     config = models.ForeignKey(DeviceConfig, on_delete=models.CASCADE, related_name="tasks")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending_approval")
     logs = models.TextField(blank=True)
+    progress = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
