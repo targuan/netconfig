@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from tasks.models import Task
 from tasks.serializers import TaskSerializer
-from core.services.napalm_service import NapalmSimulator
+from core.services.network.driver import FakeNAPALMDriver
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
@@ -34,21 +34,49 @@ class TaskViewSet(viewsets.ModelViewSet):
             return Response({"error": "Only queued tasks can be run"}, status=status.HTTP_400_BAD_REQUEST)
 
         task.status = "running"
+        task.progress = 0
         task.save()
 
+        # Get the previous config content for diff
+        previous_config = task.device.configs.filter(version__lt=task.config.version).order_by("-version").first()
+        running_config = previous_config.content if previous_config else None
+
         # Simulate execution
-        simulator = NapalmSimulator(task.device)
+        driver = FakeNAPALMDriver(task.device, running_config=running_config)
         try:
-            simulator.connect()
-            simulator.load_replace_candidate(task.config.content)
-            simulator.commit_config()
+            # Step 1: Open connection
+            task.progress = 10
+            task.save()
+            driver.open()
+
+            # Step 2: Load config
+            task.progress = 30
+            task.save()
+            driver.load_replace_candidate(task.config.content)
+
+            # Step 3: Compare config
+            task.progress = 50
+            task.save()
+            driver.compare_config()
+
+            # Step 4: Commit config
+            task.progress = 80
+            task.save()
+            driver.commit_config()
+
             task.status = "success"
+            task.progress = 100
         except Exception as e:
-            simulator.add_log(f"Error: {str(e)}")
+            driver.add_log(f"Error during execution: {str(e)}")
             task.status = "failed"
         finally:
-            simulator.close()
-            task.logs = simulator.get_logs()
+            driver.close()
+            task.logs = driver.get_logs()
             task.save()
 
         return Response(TaskSerializer(task).data)
+
+    @action(detail=True, methods=["get"])
+    def logs(self, request, pk=None):
+        task = self.get_object()
+        return Response({"logs": task.logs})

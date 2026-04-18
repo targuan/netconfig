@@ -57,11 +57,15 @@ class NetworkManagerTests(TestCase):
 
         # Run
         url = reverse("task-run", args=[task.id])
-        response = self.client.post(url)
+        # Mock random failure to ensure success for testing
+        import unittest.mock as mock
+        with mock.patch("random.random", return_value=0.5):
+            response = self.client.post(url)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         task.refresh_from_db()
         self.assertEqual(task.status, "success")
-        self.assertIn("Successfully connected", task.logs)
+        self.assertIn("Connection established", task.logs)
 
     def test_config_versioning(self):
         # First config should be v1
