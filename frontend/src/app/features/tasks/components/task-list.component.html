@@ -25,11 +25,7 @@
   <ng-container matColumnDef="status">
     <th mat-header-cell *matHeaderCellDef> Status </th>
     <td mat-cell *matCellDef="let task">
-      <mat-chip-set>
-        <mat-chip [ngClass]="'status-' + task.status">
-          {{task.status}}
-        </mat-chip>
-      </mat-chip-set>
+      <app-task-status-chip [status]="task.status" [progress]="task.progress"></app-task-status-chip>
     </td>
   </ng-container>
 
@@ -41,12 +37,18 @@
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef> Actions </th>
     <td mat-cell *matCellDef="let task">
-      <button mat-icon-button color="primary" (click)="viewLogs(task)">
-        <mat-icon>description</mat-icon>
+      <button mat-icon-button color="primary" (click)="viewLogs(task)" title="View Logs">
+        <mat-icon>terminal</mat-icon>
       </button>
-      <button mat-flat-button color="accent" *ngIf="task.status === 'pending_approval'" (click)="approveTask(task.id)">Approve</button>
-      <button mat-flat-button color="accent" *ngIf="task.status === 'approved'" (click)="queueTask(task.id)">Queue</button>
-      <button mat-flat-button color="warn" *ngIf="task.status === 'queued'" (click)="runTask(task.id)">Run</button>
+      <button mat-icon-button color="accent" *ngIf="task.status === 'pending_approval'" (click)="approveTask(task.id)" title="Approve">
+        <mat-icon>check_circle</mat-icon>
+      </button>
+      <button mat-icon-button color="accent" *ngIf="task.status === 'approved'" (click)="queueTask(task.id)" title="Schedule">
+        <mat-icon>schedule</mat-icon>
+      </button>
+      <button mat-icon-button color="warn" *ngIf="task.status === 'queued'" (click)="runTask(task.id)" title="Run Now">
+        <mat-icon>play_arrow</mat-icon>
+      </button>
     </td>
   </ng-container>
 

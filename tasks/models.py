@@ -20,6 +20,7 @@ class Task(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending_approval")
     progress = models.IntegerField(default=0)
     logs = models.TextField(blank=True)
+    progress = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

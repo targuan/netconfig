@@ -14,6 +14,10 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #sidenav mode="side" opened class="sidenav">
     <mat-nav-list>
+      <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>dashboard</mat-icon>
+        <span matListItemTitle>Dashboard</span>
+      </a>
       <a mat-list-item routerLink="/devices" routerLinkActive="active-link">
         <mat-icon matListItemIcon>router</mat-icon>
         <span matListItemTitle>Devices</span>

@@ -7,9 +7,11 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { TaskService } from '../../../core/services/task.service';
 import { Task, TaskStatus } from '../../../core/models/api.models';
 import { TaskLogsDialogComponent } from './task-logs-dialog.component';
+import { TaskStatusChipComponent } from '../../../shared/components/task-status-chip.component';
 import { Observable, timer, switchMap, BehaviorSubject, combineLatest, startWith } from 'rxjs';
 import { RouterLink } from '@angular/router';
 
@@ -25,6 +27,8 @@ import { RouterLink } from '@angular/router';
     MatDialogModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatSnackBarModule,
+    TaskStatusChipComponent,
     RouterLink
   ],
   templateUrl: './task-list.component.html',
@@ -33,6 +37,7 @@ import { RouterLink } from '@angular/router';
 export class TaskListComponent implements OnInit {
   private taskService = inject(TaskService);
   private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
 
   private statusFilter$ = new BehaviorSubject<TaskStatus | null>(null);
   tasks$!: Observable<Task[]>;
@@ -57,14 +62,20 @@ export class TaskListComponent implements OnInit {
   }
 
   approveTask(id: string) {
-    this.taskService.approveTask(id).subscribe();
+    this.taskService.approveTask(id).subscribe(() => {
+        this.snackBar.open('Task approved successfully', 'OK', { duration: 3000 });
+    });
   }
 
   queueTask(id: string) {
-    this.taskService.queueTask(id).subscribe();
+    this.taskService.queueTask(id).subscribe(() => {
+        this.snackBar.open('Task queued successfully', 'OK', { duration: 3000 });
+    });
   }
 
   runTask(id: string) {
-    this.taskService.runTask(id).subscribe();
+    this.taskService.runTask(id).subscribe(() => {
+        this.snackBar.open('Task started successfully', 'OK', { duration: 3000 });
+    });
   }
 }

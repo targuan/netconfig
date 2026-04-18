@@ -1,7 +1,14 @@
-<h2 mat-dialog-title>Task Logs</h2>
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon>terminal</mat-icon>
+  Execution Logs - {{task.device_name || 'Device'}}
+</h2>
 <mat-dialog-content>
-  <pre class="logs">{{ data.logs || 'No logs available.' }}</pre>
+  <app-task-log-viewer [logs]="task.logs"></app-task-log-viewer>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Close</button>
+  <div class="status-info" *ngIf="task.status === 'running'">
+      <mat-icon class="spinning">sync</mat-icon>
+      Executing task...
+  </div>
+  <button mat-flat-button color="primary" mat-dialog-close>CLOSE</button>
 </mat-dialog-actions>

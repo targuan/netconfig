@@ -26,6 +26,7 @@ export interface Task {
   config: string; // Config ID
   status: TaskStatus;
   logs: string;
+  progress: number;
   created_at: string;
   updated_at: string;
 }

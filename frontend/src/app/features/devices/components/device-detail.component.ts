@@ -10,13 +10,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { DeviceService } from '../../../core/services/device.service';
 import { ConfigService } from '../../../core/services/config.service';
 import { TaskService } from '../../../core/services/task.service';
 import { Device, DeviceConfig, Task } from '../../../core/models/api.models';
 import { TaskLogsDialogComponent } from '../../tasks/components/task-logs-dialog.component';
-import { Observable, switchMap, timer, startWith, map } from 'rxjs';
+import { TaskStatusChipComponent } from '../../../shared/components/task-status-chip.component';
+import { Observable, switchMap, timer, startWith, map, shareReplay } from 'rxjs';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
@@ -33,6 +35,8 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
     MatTableModule,
     MatChipsModule,
     MatDialogModule,
+    MatSnackBarModule,
+    TaskStatusChipComponent,
     FormsModule,
     RouterLink,
   ],
@@ -45,6 +49,7 @@ export class DeviceDetailComponent implements OnInit {
   private configService = inject(ConfigService);
   private taskService = inject(TaskService);
   private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
 
   device$!: Observable<Device>;
   tasks$!: Observable<Task[]>;
@@ -54,16 +59,26 @@ export class DeviceDetailComponent implements OnInit {
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id')!;
-    this.device$ = this.deviceService.getDevice(id);
 
-    this.configService.getConfigs(id).subscribe(configs => {
+    const refreshInterval$ = timer(0, 5000).pipe(shareReplay(1));
+
+    this.device$ = refreshInterval$.pipe(
+      switchMap(() => this.deviceService.getDevice(id))
+    );
+
+    refreshInterval$.pipe(
+      switchMap(() => this.configService.getConfigs(id))
+    ).subscribe(configs => {
       if (configs.length > 0) {
-        this.configContent = configs[0].content;
+        // Only update content if it's empty to avoid overwriting user edits
+        if (!this.configContent) {
+            this.configContent = configs[0].content;
+        }
         this.currentVersion = configs[0].version;
       }
     });
 
-    this.tasks$ = timer(0, 5000).pipe(
+    this.tasks$ = refreshInterval$.pipe(
       switchMap(() => this.taskService.getTasks(id)),
       startWith([])
     );
@@ -73,25 +88,34 @@ export class DeviceDetailComponent implements OnInit {
     this.configService.createConfig({ device: deviceId, content: this.configContent }).subscribe({
       next: (config) => {
         this.currentVersion = config.version;
-        // The task will be auto-created by Django signal, and reloaded by timer
+        this.snackBar.open('Configuration saved, task created', 'OK', { duration: 3000 });
       },
-      error: (err) => console.error('Error saving config', err)
+      error: (err) => {
+        console.error('Error saving config', err);
+        this.snackBar.open('Error saving configuration', 'OK', { duration: 3000 });
+      }
     });
   }
 
   viewLogs(task: Task) {
-    this.dialog.open(TaskLogsDialogComponent, { data: task, width: '600px' });
+    this.dialog.open(TaskLogsDialogComponent, { data: task, width: '800px' });
   }
 
   approveTask(id: string) {
-    this.taskService.approveTask(id).subscribe();
+    this.taskService.approveTask(id).subscribe(() => {
+        this.snackBar.open('Task approved', 'OK', { duration: 3000 });
+    });
   }
 
   queueTask(id: string) {
-    this.taskService.queueTask(id).subscribe();
+    this.taskService.queueTask(id).subscribe(() => {
+        this.snackBar.open('Task queued', 'OK', { duration: 3000 });
+    });
   }
 
   runTask(id: string) {
-    this.taskService.runTask(id).subscribe();
+    this.taskService.runTask(id).subscribe(() => {
+        this.snackBar.open('Task started', 'OK', { duration: 3000 });
+    });
   }
 }
