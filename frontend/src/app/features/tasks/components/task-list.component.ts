@@ -9,10 +9,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { TaskService } from '../../../core/services/task.service';
+import { WebSocketService } from '../../../core/services/websocket.service';
 import { Task, TaskStatus } from '../../../core/models/api.models';
 import { TaskLogsDialogComponent } from './task-logs-dialog.component';
 import { TaskStatusChipComponent } from '../../../shared/components/task-status-chip.component';
-import { Observable, timer, switchMap, BehaviorSubject, combineLatest, startWith } from 'rxjs';
+import { Observable, switchMap, BehaviorSubject, combineLatest, startWith, map, throttleTime } from 'rxjs';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -36,6 +37,7 @@ import { RouterLink } from '@angular/router';
 })
 export class TaskListComponent implements OnInit {
   private taskService = inject(TaskService);
+  private wsService = inject(WebSocketService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
 
@@ -44,11 +46,31 @@ export class TaskListComponent implements OnInit {
   displayedColumns: string[] = ['device', 'status', 'created', 'actions'];
 
   ngOnInit() {
-    this.tasks$ = combineLatest([
-      timer(0, 5000),
-      this.statusFilter$
-    ]).pipe(
-      switchMap(([_, status]) => this.taskService.getTasks(undefined, status || undefined)),
+    const initialTasks$ = this.statusFilter$.pipe(
+      switchMap(status => this.taskService.getTasks(undefined, status || undefined))
+    );
+
+    const updates$ = this.wsService.listenToTasks().pipe(
+      throttleTime(500)
+    );
+
+    this.tasks$ = combineLatest([initialTasks$, updates$.pipe(startWith(null))]).pipe(
+      map(([tasks, update]) => {
+        if (!update || update.type !== 'task.update') return tasks;
+
+        const index = tasks.findIndex(t => t.id === update.id);
+        if (index !== -1) {
+          const updatedTasks = [...tasks];
+          updatedTasks[index] = {
+            ...updatedTasks[index],
+            status: update.status as TaskStatus,
+            progress: update.progress!,
+            updated_at: update.updated_at!
+          };
+          return updatedTasks;
+        }
+        return tasks;
+      }),
       startWith([])
     );
   }

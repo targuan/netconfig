@@ -5,8 +5,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TaskLogViewerComponent } from '../../../shared/components/task-log-viewer.component';
 import { TaskService } from '../../../core/services/task.service';
+import { WebSocketService } from '../../../core/services/websocket.service';
 import { Task } from '../../../core/models/api.models';
-import { Subscription, timer, switchMap, filter, tap } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-task-logs-dialog',
@@ -18,19 +19,32 @@ import { Subscription, timer, switchMap, filter, tap } from 'rxjs';
 export class TaskLogsDialogComponent implements OnInit, OnDestroy {
   task = inject<Task>(MAT_DIALOG_DATA);
   private taskService = inject(TaskService);
+  private wsService = inject(WebSocketService);
   private subscription?: Subscription;
 
   ngOnInit() {
-    if (this.task.status === 'running' || this.task.status === 'queued') {
-      this.subscription = timer(0, 2000).pipe(
-        switchMap(() => this.taskService.getTask(this.task.id)),
-        tap(updatedTask => {
+    this.subscription = this.wsService.listenToTask(this.task.id).subscribe(event => {
+      if (event.type === 'task.update') {
+        this.task = {
+          ...this.task,
+          status: event.status as any,
+          progress: event.progress!,
+          updated_at: event.updated_at!
+        };
+      } else if (event.type === 'task.log') {
+        this.task = {
+          ...this.task,
+          logs: (this.task.logs || '') + (this.task.logs ? '\n' : '') + event.log_line
+        };
+      }
+    });
+
+    if (!this.task.logs) {
+      this.taskService.getTask(this.task.id).subscribe(updatedTask => {
+        if (!this.task.logs) {
           this.task = updatedTask;
-          if (updatedTask.status !== 'running' && updatedTask.status !== 'queued') {
-            this.subscription?.unsubscribe();
-          }
-        })
-      ).subscribe();
+        }
+      });
     }
   }
 
