@@ -1,31 +1,17 @@
 import time
 import random
 import difflib
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
 
 class FakeNAPALMDriver:
-    def __init__(self, device, running_config=None, task_id=None):
+    def __init__(self, device, running_config=None):
         self.device = device
         self.logs = []
         self.candidate_config = None
         self.running_config = running_config or "hostname old-device\ninterface GigabitEthernet1\n  description initial config"
-        self.task_id = task_id
-        self.channel_layer = get_channel_layer()
 
     def add_log(self, message):
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-        log_line = f"[{timestamp}] {message}"
-        self.logs.append(log_line)
-        if self.task_id:
-            async_to_sync(self.channel_layer.group_send)(
-                f"task_{self.task_id}",
-                {
-                    "type": "task.log",
-                    "task_id": str(self.task_id),
-                    "log_line": log_line
-                }
-            )
+        self.logs.append(f"[{timestamp}] {message}")
 
     def open(self):
         self.add_log(f"Opening connection to device {self.device.ip_address}")
