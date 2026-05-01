@@ -6,4 +6,4 @@ drf-spectacular
 requests
 django-cors-headers
 channels[daphne]
-psycopg
+psycopg2
