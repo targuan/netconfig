@@ -1,0 +1,40 @@
+.dashboard-container {
+    padding: 20px;
+  }
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .full-width {
+    width: 100%;
+  }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .device-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .no-data {
+    padding: 32px;
+    text-align: center;
+    color: #666;
+  }
+  .task-row {
+    height: 48px;
+  }
+  h1 {
+    margin-bottom: 32px;
+    font-weight: 300;
+    color: #333;
+  }
+  @media (max-width: 1024px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+  }

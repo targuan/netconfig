@@ -7,7 +7,7 @@ import { Device } from '../models/api.models';
   providedIn: 'root'
 })
 export class DeviceService {
-  private apiUrl = '/api/devices/';
+  private apiUrl = 'https://netgui.targuan.fr/api/devices/';
 
   constructor(private http: HttpClient) { }
 

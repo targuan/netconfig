@@ -7,7 +7,7 @@ import { DeviceConfig } from '../models/api.models';
   providedIn: 'root'
 })
 export class ConfigService {
-  private apiUrl = '/api/configs/';
+  private apiUrl = 'https://netgui.targuan.fr/api/configs/';
 
   constructor(private http: HttpClient) { }
 

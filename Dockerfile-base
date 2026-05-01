@@ -9,9 +9,9 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Install Python dependencies
-COPY requirements.txt /app/
+COPY ./backend/requirements.txt /app/
 RUN pip install --no-cache-dir -U wheel pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project
-COPY . /app/
+COPY ./backend /app/
