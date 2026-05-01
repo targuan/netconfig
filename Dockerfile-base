@@ -8,6 +8,8 @@ ENV PYTHONUNBUFFERED=1
 # Set work directory
 WORKDIR /app
 
+apt install postgresql postgresql-contrib
+
 # Install Python dependencies
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -U wheel pip
