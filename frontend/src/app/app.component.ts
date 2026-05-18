@@ -9,6 +9,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { TaskService } from './core/services/task.service';
 import { map, timer, switchMap, shareReplay } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { ChatComponent } from './shared/components/chat/chat.component';
 
 @Component({
   selector: 'app-root',
@@ -23,7 +24,8 @@ import { CommonModule } from '@angular/common';
     MatListModule,
     MatIconModule,
     MatButtonModule,
-    MatBadgeModule
+    MatBadgeModule,
+    ChatComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
