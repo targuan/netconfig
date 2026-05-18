@@ -1,0 +1,60 @@
+<div class="chat-wrapper" [class.open]="isOpen">
+  <!-- Collapsed state / Trigger -->
+  <button
+    mat-fab
+    color="primary"
+    class="chat-trigger"
+    (click)="toggleChat()"
+    [matBadge]="(chatService.totalUnread$ | async) ? '' : null"
+    matBadgeColor="warn"
+    matBadgeSize="small"
+  >
+    <mat-icon>{{ isOpen ? 'close' : 'chat' }}</mat-icon>
+  </button>
+
+  <!-- Expanded state -->
+  <div class="chat-container mat-elevation-z4" *ngIf="isOpen">
+    <div class="chat-header">
+      <span>Chat</span>
+      <button mat-icon-button (click)="toggleChat()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <mat-tab-group [(selectedIndex)]="activeRoomIndex" (selectedIndexChange)="onTabChange($event)" class="chat-tabs">
+      <mat-tab *ngFor="let room of rooms">
+        <ng-template mat-tab-label>
+          <span [matBadge]="room.hasUnread ? '' : null" matBadgeColor="warn" matBadgeSize="small" matBadgeOverlap="false">
+            {{ room.name }}
+          </span>
+        </ng-template>
+
+        <div class="messages-viewport" #scrollContainer>
+          <div *ngFor="let msg of room.messages" class="message-row" [class.me]="msg.sender === 'me'">
+            <div class="message-bubble">
+              <div class="message-text">{{ msg.text }}</div>
+              <div class="message-time">{{ msg.timestamp | date:'HH:mm' }}</div>
+            </div>
+          </div>
+          <div *ngIf="room.messages.length === 0" class="no-messages">
+            No messages in this room yet.
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <input
+              matInput
+              placeholder="Type a message..."
+              [(ngModel)]="newMessage"
+              (keyup.enter)="sendMessage(room.id)"
+            >
+            <button matSuffix mat-icon-button (click)="sendMessage(room.id)" [disabled]="!newMessage.trim()">
+              <mat-icon>send</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
