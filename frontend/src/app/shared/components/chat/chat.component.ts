@@ -56,7 +56,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     this.activeRoomIndex = index;
     const activeRoomId = this.rooms[index]?.id;
     if (activeRoomId) {
-      this.chatService.clearUnread(activeRoomId);
+      this.chatService.setChatOpen(this.isOpen, activeRoomId);
     }
   }
 

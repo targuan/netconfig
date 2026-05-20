@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone, inject } from '@angular/core';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { BehaviorSubject } from 'rxjs';
 import { ChatRoomState, ChatRoomType } from '../models/chat.models';
@@ -7,6 +7,7 @@ import { ChatRoomState, ChatRoomType } from '../models/chat.models';
   providedIn: 'root'
 })
 export class ChatService {
+  private zone = inject(NgZone);
   private websockets: Map<ChatRoomType, WebSocketSubject<any>> = new Map();
   private pendingMessages: Map<ChatRoomType, string[]> = new Map();
 
@@ -27,6 +28,7 @@ export class ChatService {
   public totalUnread$ = this._totalUnread$.asObservable();
 
   private _isChatOpen = false;
+  private _activeRoomId: ChatRoomType = 'general';
 
   constructor() {
     this.initialRooms.forEach(room => {
@@ -46,7 +48,9 @@ export class ChatService {
     socket$.subscribe({
       next: (msg: any) => {
         if (msg.message) {
-          this.handleIncomingMessage(room, msg.message);
+          this.zone.run(() => {
+            this.handleIncomingMessage(room, msg.message);
+          });
         }
       },
       error: (err) => {
@@ -83,7 +87,7 @@ export class ChatService {
         timestamp: new Date()
       }];
 
-      if (!this._isChatOpen) {
+      if (!this._isChatOpen || this._activeRoomId !== room) {
         targetRoom.hasUnread = true;
         this._totalUnread$.next(true);
       }
@@ -97,20 +101,22 @@ export class ChatService {
     const socket = this.websockets.get(room);
 
     // Add "me" message locally immediately for better UX
-    const currentRooms = this._rooms$.value;
-    const roomIndex = currentRooms.findIndex(r => r.id === room);
-    if (roomIndex !== -1) {
-      const updatedRooms = [...currentRooms];
-      const targetRoom = { ...updatedRooms[roomIndex] };
-      targetRoom.messages = [...targetRoom.messages, {
-        room,
-        text,
-        sender: 'me',
-        timestamp: new Date()
-      }];
-      updatedRooms[roomIndex] = targetRoom;
-      this._rooms$.next(updatedRooms);
-    }
+    this.zone.run(() => {
+      const currentRooms = this._rooms$.value;
+      const roomIndex = currentRooms.findIndex(r => r.id === room);
+      if (roomIndex !== -1) {
+        const updatedRooms = [...currentRooms];
+        const targetRoom = { ...updatedRooms[roomIndex] };
+        targetRoom.messages = [...targetRoom.messages, {
+          room,
+          text,
+          sender: 'me',
+          timestamp: new Date()
+        }];
+        updatedRooms[roomIndex] = targetRoom;
+        this._rooms$.next(updatedRooms);
+      }
+    });
 
     if (socket) {
       // We still send to WS but we don't need to track it in pendingMessages
@@ -123,6 +129,9 @@ export class ChatService {
 
   setChatOpen(isOpen: boolean, activeRoomId?: ChatRoomType) {
     this._isChatOpen = isOpen;
+    if (activeRoomId) {
+      this._activeRoomId = activeRoomId;
+    }
     if (isOpen && activeRoomId) {
       this.clearUnread(activeRoomId);
     }

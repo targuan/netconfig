@@ -1,0 +1,31 @@
+
+Warning: This is a simple server for use in testing or debugging Angular applications
+locally. It hasn't been reviewed for security issues.
+
+Binding this server to an open connection can result in compromising your application or
+computer. Using a different host than the one passed to the "--host" flag might result in
+websocket connection issues.
+
+❯ Building...
+✔ Building...
+Initial chunk files | Names         |  Raw size
+main.js             | main          | 168.67 kB |
+styles.css          | styles        | 103.16 kB |
+
+                    | Initial total | 271.82 kB
+
+Application bundle generation complete. [6.565 seconds] - 2026-05-20T16:48:51.749Z
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mTypeScript compiler options 'target' and 'useDefineForClassFields' are set to 'ES2022' and 'false' respectively by the Angular CLI.[0m [1m[35m[plugin angular-compiler][0m
+
+    tsconfig.app.json:0:0:
+[37m      0 │ [32m[37m
+        ╵ [32m^[0m
+
+  To control ECMA version and features use the Browserslist configuration. For more information, see [4mhttps://angular.dev/tools/cli/build#configuring-browser-compatibility[0m
+
+
+Watch mode enabled. Watching for file changes...
+NOTE: Raw file sizes do not reflect development server per-request transformations.
+  ➜  Local:   http://localhost:4200/
+  ➜  Network: http://192.168.0.2:4200/
